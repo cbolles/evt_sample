@@ -20,7 +20,6 @@ add_library(${PROJECT_NAME} SHARED)
 target_sources(${PROJECT_NAME} PRIVATE
     src/io/f3xx/GPIO.cpp
     src/dev/LED.cpp
-    src/utils/bits.cpp
 )
 
 # Check to see if this project is being built on its own, or as a dependency
@@ -44,9 +43,16 @@ cmake_dependent_option(EVT_BUILD_SAMPLES
 # Determine if the project should be installed and made accessible as a
 # library. Defaults to true if this project is not the main project
 cmake_dependent_option(EVT_INSTALL
-    "Install the EVT library" ON
-    "EVT_IS_MAIN_PROJECT" OFF
+    "Install the EVT library" OFF
+    "NOT EVT_IS_MAIN_PROJECT" ON
 )
+
+# Debug messages, should be removed
+message("EVT_IS_MAIN_PROJECT: ${EVT_IS_MAIN_PROJECT}")
+message("EVT_INSTALL: ${EVT_INSTALL}")
+message("EVT_BUILD_SAMPLES: ${EVT_BUILD_SAMPLES}")
+message("CMAKE_PROJECT_NAME: ${CMAKE_PROJECT_NAME}")
+message("PROJECT_NAME: ${PROJECT_NAME}")
 
 ###############################################################################
 # Install and expose library
