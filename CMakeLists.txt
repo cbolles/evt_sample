@@ -31,6 +31,32 @@ else()
 endif()
 
 ###############################################################################
+# Compiler settings
+###############################################################################
+# Verify that the ARM tools path is set
+if(NOT DEFINED ENV{GCC_ARM_TOOLS_PATH})
+    message(FATAL_ERROR 
+        "Set your environment variables you frickin' hecker."
+        "   --John Jenco"
+    )
+endif()
+
+# Set C and C++ compiler
+set(CMAKE_CXX_COMPILER "$ENV{GCC_ARM_TOOLS_PATH}/arm-none-eabi-g++")
+set(CMAKE_C_COMPILER "$ENV{GCC_ARM_TOOLS_PATH}/arm-none-eabi-gcc")
+
+###############################################################################
+# Handle dependencies
+###############################################################################
+add_subdirectory(libs/HALf3/)
+
+# Later this will be handled dynamically, either the HALf3 or the HALf4 will
+# be linked to
+target_link_libraries(${PROJECT_NAME}
+    HALf3
+)
+
+###############################################################################
 # Provide build options
 ###############################################################################
 # Determine if the sample code should be built. Defaults to false if this
@@ -47,19 +73,17 @@ cmake_dependent_option(EVT_INSTALL
     "NOT EVT_IS_MAIN_PROJECT" ON
 )
 
-# Debug messages, should be removed
-message("EVT_IS_MAIN_PROJECT: ${EVT_IS_MAIN_PROJECT}")
-message("EVT_INSTALL: ${EVT_INSTALL}")
-message("EVT_BUILD_SAMPLES: ${EVT_BUILD_SAMPLES}")
-message("CMAKE_PROJECT_NAME: ${CMAKE_PROJECT_NAME}")
-message("PROJECT_NAME: ${PROJECT_NAME}")
+# Determine if the sample code should be added. By default, if this is the
+# main project then samples will be compiled, otherwise they will not.
+cmake_dependent_option(EVT_BUILD_SAMPLES
+    "Build samples" OFF
+    "EVT_IS_MAIN_PROJECT" ON
+)
 
 ###############################################################################
 # Install and expose library
 ###############################################################################
 if(EVT_INSTALL)
-
-    message("here")
 
     # Expose headers
     target_include_directories(${PROJECT_NAME}
@@ -87,4 +111,12 @@ if(EVT_INSTALL)
     install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
     )
+endif()
+
+###############################################################################
+# Handle adding samples
+###############################################################################
+if(EVT_BUILD_SAMPLES)
+    # Add the sample code sub directory
+    add_subdirectory(samples)
 endif()
