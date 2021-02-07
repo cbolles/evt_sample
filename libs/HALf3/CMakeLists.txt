@@ -15,13 +15,22 @@ project(HALf3
     LANGUAGES C ASM
 )
 
-add_library(${PROJECT_NAME} SHARED)
+add_library(${PROJECT_NAME} STATIC)
 
 # Glob together all C source files
-file(GLOB SRC_FILES src/*.c)
+file(GLOB HALf3_C_SRC_FILES src/*.c)
 
-# Add C source
-target_sources(${PROJECT_NAME} PRIVATE ${SRC_FILES})
+# Handle assembly file
+set_source_files_properties(
+    src/startup_stm32f302x8.s 
+    PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp"
+)
+
+# Add C and Assembly source files
+target_sources(${PROJECT_NAME} PRIVATE 
+    ${HALf3_C_SRC_FILES}
+    src/startup_stm32f302x8.s
+)
 
 # Add headers privately.
 # NOTE: This is a flat inclusion of the headers as that is how the STM HAL
@@ -30,6 +39,14 @@ target_include_directories(${PROJECT_NAME} PRIVATE include/HALf3/)
 
 # Define more specifics about the F3 version
 add_compile_definitions(STM32F302x8)
+
+###############################################################################
+# Compiler settings
+###############################################################################
+# Add flags for specific version of hardware
+set(HALf3_HARDWARE_FLAGS "-mthumb -mcpu=cortex-m4")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${HALf3_HARDWARE_FLAGS}")
 
 ###############################################################################
 # Expose library

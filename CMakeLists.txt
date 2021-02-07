@@ -3,18 +3,53 @@
 ###############################################################################
 cmake_minimum_required(VERSION 3.15)
 
-include(GNUInstallDirs)
-include(CMakeDependentOption)
+###############################################################################
+# Compiler settings
+###############################################################################
+# Verify that the ARM tools path is set
+if(NOT DEFINED ENV{GCC_ARM_TOOLS_PATH})
+    message(FATAL_ERROR 
+        "Set your environment variables you frickin' hecker."
+        "   --John Jenco"
+    )
+endif()
+
+# Setup for cross compilation
+set(CMAKE_SYSTEM_NAME       Generic)
+set(CMAKE_SYSTEM_PROCESSOR  arm)
+set(CMAKE_AR                "$ENV{GCC_ARM_TOOLS_PATH}/arm-none-eabi-ar")
+set(CMAKE_ASM_COMPILER      "$ENV{GCC_ARM_TOOLS_PATH}/arm-none-eabi-gcc")
+set(CMAKE_C_COMPILER        "$ENV{GCC_ARM_TOOLS_PATH}/arm-none-eabi-gcc")
+set(CMAKE_CXX_COMPILER      "$ENV{GCC_ARM_TOOLS_PATH}/arm-none-eabi-g++")
+set(CMAKE_LINKER            "$ENV{GCC_ARM_TOOLS_PATH}/arm-none-eabi-ld")
+set(CMAKE_OBJCOPY           "$ENV{GCC_ARM_TOOLS_PATH}/arm-none-eabi-objcopy")
+set(CMAKE_RANLIB            "$ENV{GCC_ARM_TOOLS_PATH}/arm-none-eabi-ranlib")
+set(CMAKE_SIZE              "$ENV{GCC_ARM_TOOLS_PATH}/arm-none-eabi-size")
+set(CMAKE_STRIP             "$ENV{GCC_ARM_TOOLS_PATH}/arm-none-eabi-strip")
+
+set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -Wno-psabi \
+                            -fdata-sections -ffunction-sections \
+                            -Wl,--gc-sections " CACHE INTERNAL "")
+set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -fno-exceptions \
+                            " CACHE INTERNAL "")
+set(CMAKE_EXE_LINKER_FLAGS "-specs=nosys.specs")
+
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 ###############################################################################
 # Project Setup
 ###############################################################################
 project(EVT
     VERSION 0.0.1
-    LANGUAGES CXX
+    LANGUAGES CXX C
 )
 
-add_library(${PROJECT_NAME} SHARED)
+include(GNUInstallDirs)
+include(CMakeDependentOption)
+
+add_library(${PROJECT_NAME} STATIC)
 
 # Add sources
 target_sources(${PROJECT_NAME} PRIVATE
@@ -29,21 +64,6 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 else()
     set(EVT_IS_MAIN_PROJECT FALSE)
 endif()
-
-###############################################################################
-# Compiler settings
-###############################################################################
-# Verify that the ARM tools path is set
-if(NOT DEFINED ENV{GCC_ARM_TOOLS_PATH})
-    message(FATAL_ERROR 
-        "Set your environment variables you frickin' hecker."
-        "   --John Jenco"
-    )
-endif()
-
-# Set C and C++ compiler
-set(CMAKE_CXX_COMPILER "$ENV{GCC_ARM_TOOLS_PATH}/arm-none-eabi-g++")
-set(CMAKE_C_COMPILER "$ENV{GCC_ARM_TOOLS_PATH}/arm-none-eabi-gcc")
 
 ###############################################################################
 # Handle dependencies
