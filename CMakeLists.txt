@@ -32,7 +32,8 @@ set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -Wno-psabi \
                             -Wl,--gc-sections " CACHE INTERNAL "")
 set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -fno-exceptions \
                             " CACHE INTERNAL "")
-set(CMAKE_EXE_LINKER_FLAGS "-specs=nosys.specs -mthumb -mcpu=cortex-m4")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -specs=nosys.specs\
+                            -mthumb -mcpu=cortex-m4")
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)

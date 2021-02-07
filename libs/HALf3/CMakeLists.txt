@@ -52,7 +52,6 @@ add_compile_definitions(STM32F302x8)
 set(HALf3_HARDWARE_FLAGS "-mthumb -mcpu=cortex-m4")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${HALf3_HARDWARE_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${HALf3_HARDWARE_FLAGS}")
 
 ###############################################################################
 # Expose library
